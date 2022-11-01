@@ -109,10 +109,12 @@ module "broker_security_group" {
 resource "aws_msk_configuration" "config" {
   count          = local.enabled ? 1 : 0
   kafka_versions = [var.kafka_version]
-  name           = module.this.id
+  name           = "${module.this.id}-${var.kafka_version}"
   description    = "Manages an Amazon Managed Streaming for Kafka configuration"
 
   server_properties = join("\n", [for k in keys(var.properties) : format("%s = %s", k, var.properties[k])])
+
+  create_before_destroy = true
 }
 
 resource "aws_msk_cluster" "default" {
